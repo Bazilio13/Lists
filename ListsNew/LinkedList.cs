@@ -485,14 +485,6 @@ namespace Lists
                     newList.Add(current.Value);
                     current = current.Next;
                 }
-                newList._root = list._root;
-                newList._tail = list._tail;
-            }
-            else
-            {
-                newList._root = list._root;
-                newList._tail = list._tail;
-                newList.Length = list.Length;
             }
             return newList;
         }
