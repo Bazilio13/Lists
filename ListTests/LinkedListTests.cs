@@ -261,6 +261,18 @@ namespace LinkedListTests
         }
 
         [TestCase(new int[] { 1, -6, 5, -10 }, new int[] { -10, -6, 1, 5 })]
+        [TestCase(new int[] { 1, 6, 2, 5, 7, 8, 4, 9, 3 }, new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 })]
+        [TestCase(new int[] { }, new int[] { })]
+        [TestCase(new int[] { 1 }, new int[] { 1 })]
+        public void MergeSort_Test(int[] array, int[] expectedArray)
+        {
+            LinkedList actual = new LinkedList(array);
+            actual.MergeSort();
+            LinkedList expected = new LinkedList(expectedArray);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestCase(new int[] { 1, -6, 5, -10 }, new int[] { -10, -6, 1, 5 })]
         [TestCase(new int[] { }, new int[] { })]
         [TestCase(new int[] { 1 }, new int[] { 1 })]
         public void AscendingSort_Test(int[] array, int[] expectedArray)

@@ -232,7 +232,7 @@ namespace Lists
 
         public int GetMaxElement()
         {
-            return GetMaxElementWithIndex()._root.Value; 
+            return GetMaxElementWithIndex()._root.Value;
         }
         public int GetIndexOfMaxElement()
         {
@@ -247,6 +247,74 @@ namespace Lists
         public int GetIndexOfMinElement()
         {
             return GetMinElementWithIndex()._tail.Value;
+        }
+
+        public void MergeSort()
+        {
+            if (Length > 1)
+            {
+
+
+                LinkedList left = this;
+                LinkedList right = this.CutRightHulf();
+                if (left.Length > 1)
+                {
+                    left.MergeSort();
+                }
+                if (right.Length > 1)
+                {
+                    right.MergeSort();
+                }
+
+                LinkedList mergedList = new LinkedList();
+                Node currentLeft = left._root;
+                Node currentRight = right._root;
+                int j = 0;
+                while (!(currentLeft is null))
+                {
+                    if (!(currentLeft is null) && (currentRight is null || currentLeft.Value <= currentRight.Value))
+                    {
+                        mergedList.Add(currentLeft.Value);
+                        currentLeft = currentLeft.Next;
+                    }
+                    else
+                    {
+                        while (!(currentRight is null))
+                        {
+                            if (!(currentRight is null) && (currentLeft is null || currentRight.Value <= currentLeft.Value))
+                            {
+                                mergedList.Add(currentRight.Value);
+                                currentRight = currentRight.Next;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                while (!(currentRight is null))
+                {
+                    mergedList.Add(currentRight.Value);
+                    currentRight = currentRight.Next;
+                }
+
+                Length = mergedList.Length;
+                _root = mergedList._root;
+                _tail = mergedList._tail;
+            }
+        }
+
+        private LinkedList CutRightHulf()
+        {
+            LinkedList rightHulf = new LinkedList();
+            rightHulf._tail = _tail;
+            _tail = GetNodeByIndex(Length / 2 - 1);
+            rightHulf._root = _tail.Next;
+            rightHulf.Length = Length - Length / 2;
+            Length /= 2;
+            _tail.Next = null;
+            return rightHulf;
         }
 
         public void AscendingSort()
