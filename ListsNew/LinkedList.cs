@@ -269,10 +269,9 @@ namespace Lists
                 LinkedList mergedList = new LinkedList();
                 Node currentLeft = left._root;
                 Node currentRight = right._root;
-                int j = 0;
                 while (!(currentLeft is null))
                 {
-                    if (!(currentLeft is null) && (currentRight is null || currentLeft.Value <= currentRight.Value))
+                    if (currentRight is null || currentLeft.Value <= currentRight.Value)
                     {
                         mergedList.Add(currentLeft.Value);
                         currentLeft = currentLeft.Next;
@@ -281,7 +280,7 @@ namespace Lists
                     {
                         while (!(currentRight is null))
                         {
-                            if (!(currentRight is null) && (currentLeft is null || currentRight.Value <= currentLeft.Value))
+                            if (currentRight.Value <= currentLeft.Value)
                             {
                                 mergedList.Add(currentRight.Value);
                                 currentRight = currentRight.Next;
