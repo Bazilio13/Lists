@@ -219,6 +219,7 @@ namespace Lists
                 Node next = current.Next;
                 while (!(current.Next is null))
                 {
+
                     current.Next = previous;
                     previous = current;
                     current = next;
@@ -231,86 +232,21 @@ namespace Lists
 
         public int GetMaxElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int maxElement;
-            maxElement = _root.Value;
-            Node current = _root;
-
-            for (int i = 1; i < Length; i++)
-            {
-                current = current.Next;
-                if (current.Value > maxElement)
-                {
-                    maxElement = current.Value;
-                }
-            }
-            return maxElement;
+            return GetMaxElementWithIndex()._root.Value; 
         }
         public int GetIndexOfMaxElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int maxElement;
-            maxElement = _root.Value;
-            Node current = _root;
-            int indexOfMaxElement = 0;
-            for (int i = 1; i < Length; i++)
-            {
-                current = current.Next;
-                if (current.Value > maxElement)
-                {
-                    maxElement = current.Value;
-                    indexOfMaxElement = i;
-                }
-            }
-            return indexOfMaxElement;
+            return GetMaxElementWithIndex()._tail.Value;
         }
+
         public int GetMinElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int minElement;
-            minElement = _root.Value;
-            Node current = _root;
-
-            for (int i = 1; i < Length; i++)
-            {
-                current = current.Next;
-                if (current.Value < minElement)
-                {
-                    minElement = current.Value;
-                }
-            }
-            return minElement;
+            return GetMinElementWithIndex()._root.Value;
         }
 
         public int GetIndexOfMinElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int minElement;
-            minElement = _root.Value;
-            Node current = _root;
-            int indexOfMinElement = 0;
-            for (int i = 1; i < Length; i++)
-            {
-                current = current.Next;
-                if (current.Value < minElement)
-                {
-                    minElement = current.Value;
-                    indexOfMinElement = i;
-                }
-            }
-            return indexOfMinElement;
+            return GetMinElementWithIndex()._tail.Value;
         }
 
         public void AscendingSort()
@@ -537,7 +473,6 @@ namespace Lists
             return true;
         }
 
-
         private void RemoveCurrentNode(Node currentNode, int index, Node previousNode)
         {
             if (index == 0)
@@ -554,6 +489,51 @@ namespace Lists
             {
                 previousNode.Next = GetNewNextAndRemoveNode(currentNode);
             }
+        }
+
+        private LinkedList GetMaxElementWithIndex()
+        {
+            if (Length == 0)
+            {
+                throw new NullReferenceException();
+            }
+            int maxElement;
+            maxElement = _root.Value;
+            Node current = _root;
+            int indexOfMaxElement = 0;
+            for (int i = 1; i < Length; i++)
+            {
+                current = current.Next;
+                if (current.Value > maxElement)
+                {
+                    maxElement = current.Value;
+                    indexOfMaxElement = i;
+                }
+            }
+            LinkedList maxElementWithIndex = new LinkedList(new int[] { maxElement, indexOfMaxElement });
+            return maxElementWithIndex;
+        }
+        private LinkedList GetMinElementWithIndex()
+        {
+            if (Length == 0)
+            {
+                throw new NullReferenceException();
+            }
+            int minElement;
+            minElement = _root.Value;
+            Node current = _root;
+            int indexOfMinElement = 0;
+            for (int i = 1; i < Length; i++)
+            {
+                current = current.Next;
+                if (current.Value < minElement)
+                {
+                    minElement = current.Value;
+                    indexOfMinElement = i;
+                }
+            }
+            LinkedList maxElementWithIndex = new LinkedList(new int[] { minElement, indexOfMinElement });
+            return maxElementWithIndex;
         }
 
         private Node GetNewNextAndRemoveNode(Node node)

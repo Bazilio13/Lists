@@ -64,11 +64,11 @@ namespace Lists
             {
                 UpSize();
             }
-            ShiftRight(0,1);
+            ShiftRight(0, 1);
             _array[0] = value;
         }
 
-        public void AddByIndex (int value, int index)
+        public void AddByIndex(int value, int index)
         {
             if (index < 0 || index > Length)
             {
@@ -236,38 +236,12 @@ namespace Lists
 
         public int GetMaxElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int maxElement;
-            maxElement = _array[0];
-            for (int i = 1; i < Length; i++)
-            {
-                if (_array[i] > maxElement)
-                {
-                    maxElement = _array[i];
-                }
-            }
-            return maxElement;
+            return this[GetIndexOfMaxElement()];
         }
 
         public int GetMinElement()
         {
-            if (Length == 0)
-            {
-                throw new NullReferenceException();
-            }
-            int minElement;
-            minElement = _array[0];
-            for (int i = 1; i < Length; i++)
-            {
-                if (_array[i] < minElement)
-                {
-                    minElement = _array[i];
-                }
-            }
-            return minElement;
+            return this[GetIndexOfMinElement()];
         }
 
         public int GetIndexOfMaxElement()
@@ -387,7 +361,7 @@ namespace Lists
             {
                 throw new IndexOutOfRangeException();
             }
-            
+
             ShiftRight(index, list.Length);
             InsertList(list, index);
 
@@ -455,7 +429,7 @@ namespace Lists
 
         private void ShiftRight(int startIndex, int steps)
         {
-            
+
             if (startIndex > Length || startIndex < 0)
             {
                 throw new IndexOutOfRangeException();
@@ -471,9 +445,9 @@ namespace Lists
                 throw new ArgumentException();
             }
 
-            for (int i = Length-1; i >= startIndex + steps; i--)
+            for (int i = Length - 1; i >= startIndex + steps; i--)
             {
-                _array[i] = _array[i-steps];
+                _array[i] = _array[i - steps];
             }
         }
 
