@@ -237,40 +237,34 @@ namespace Lists
         {
             if (Length > 1)
             {
-
-
-                LinkedList left = this;
                 LinkedList right = this.CutRightHulf();
-                if (left.Length > 1)
+                if (Length > 1)
                 {
-                    left.MergeSort();
+                    MergeSort();
                 }
                 if (right.Length > 1)
                 {
                     right.MergeSort();
                 }
-
-                left._tail = left._root;
-                Node currentLeft = left._root;
+                Node currentLeft = _root;
                 Node currentRight = right._root;
-                Node nextRight = currentRight.Next;
-                if (right._root.Value < left._root.Value )
+                _tail = null;
+                if (right._root.Value < _root.Value)
                 {
-                    left._root = right._root;
-                    left._tail = right._root;
+                    _root = right._root;
+                    _tail = right._root;
                     currentRight = currentRight.Next;
-                    left.Length++;
                 }
                 else
                 {
+                    _tail = _root;
                     currentLeft = currentLeft.Next;
                 }
                 while (!(currentLeft is null))
                 {
                     if (currentRight is null || currentLeft.Value <= currentRight.Value)
                     {
-                        left._tail.Next = currentLeft;
-                        left._tail = currentLeft;
+                        HookNode(currentLeft);
                         currentLeft = currentLeft.Next;
                     }
                     else
@@ -279,14 +273,8 @@ namespace Lists
                         {
                             if (currentRight.Value <= currentLeft.Value)
                             {
-                                left._tail.Next = currentRight;
-                                left._tail = currentRight;
+                                HookNode(currentRight);
                                 currentRight = currentRight.Next;
-                                if (!(nextRight is null))
-                                {
-                                    nextRight = nextRight.Next;
-                                }
-                                left.Length++;
                             }
                             else
                             {
@@ -297,12 +285,11 @@ namespace Lists
                 }
                 while (!(currentRight is null))
                 {
-                    left._tail.Next = currentRight;
-                    left._tail = currentRight;
+                    HookNode(currentRight);
                     currentRight = currentRight.Next;
-                    left.Length++;
                 }
-                left._tail.Next = null;
+                _tail.Next = null;
+                Length += right.Length;
             }
         }
 
@@ -538,6 +525,7 @@ namespace Lists
 
             return true;
         }
+
         private LinkedList CutRightHulf()
         {
             LinkedList rightHulf = new LinkedList();
@@ -550,6 +538,11 @@ namespace Lists
             return rightHulf;
         }
 
+        private void HookNode(Node hookedNode)
+        {
+            _tail.Next = hookedNode;
+            _tail = hookedNode;
+        }
         private void RemoveCurrentNode(Node currentNode, int index, Node previousNode)
         {
             if (index == 0)
