@@ -198,35 +198,19 @@ namespace Lists
 
         public void ReversList()
         {
-            if (Length < 2)
+            if (Length > 1)
             {
-                return;
-            }
-            Node current;
-            current = _root;
-            Node tmpNode;
-            tmpNode = _tail;
-            _tail = _root;
-            _root = tmpNode;
-            if (Length == 2)
-            {
-                _root.Next = _tail;
-                _tail.Next = null;
-            }
-            else
-            {
+                _tail = _root;
                 Node previous = null;
-                Node next = current.Next;
-                while (!(current.Next is null))
+                Node next = _root.Next;
+                while (!(_root.Next is null))
                 {
-
-                    current.Next = previous;
-                    previous = current;
-                    current = next;
+                    _root.Next = previous;
+                    previous = _root;
+                    _root = next;
                     next = next.Next;
                 }
                 _root.Next = previous;
-
             }
         }
 
@@ -267,13 +251,27 @@ namespace Lists
                 }
 
                 LinkedList mergedList = new LinkedList();
+                left._tail = left._root;
                 Node currentLeft = left._root;
                 Node currentRight = right._root;
+                Node nextRight = currentRight.Next;
+                if (right._root.Value < left._root.Value )
+                {
+                    left._root = right._root;
+                    left._tail = right._root;
+                    currentRight = currentRight.Next;
+                    left.Length++;
+                }
+                else
+                {
+                    currentLeft = currentLeft.Next;
+                }
                 while (!(currentLeft is null))
                 {
                     if (currentRight is null || currentLeft.Value <= currentRight.Value)
                     {
-                        mergedList.Add(currentLeft.Value);
+                        left._tail.Next = currentLeft;
+                        left._tail = currentLeft;
                         currentLeft = currentLeft.Next;
                     }
                     else
@@ -282,8 +280,14 @@ namespace Lists
                         {
                             if (currentRight.Value <= currentLeft.Value)
                             {
-                                mergedList.Add(currentRight.Value);
+                                left._tail.Next = currentRight;
+                                left._tail = currentRight;
                                 currentRight = currentRight.Next;
+                                if (!(nextRight is null))
+                                {
+                                    nextRight = nextRight.Next;
+                                }
+                                left.Length++;
                             }
                             else
                             {
@@ -294,27 +298,15 @@ namespace Lists
                 }
                 while (!(currentRight is null))
                 {
-                    mergedList.Add(currentRight.Value);
+                    left._tail.Next = currentRight;
+                    left._tail = currentRight;
                     currentRight = currentRight.Next;
+                    left.Length++;
                 }
-
-                Length = mergedList.Length;
-                _root = mergedList._root;
-                _tail = mergedList._tail;
+                left._tail.Next = null;
             }
         }
 
-        private LinkedList CutRightHulf()
-        {
-            LinkedList rightHulf = new LinkedList();
-            rightHulf._tail = _tail;
-            _tail = GetNodeByIndex(Length / 2 - 1);
-            rightHulf._root = _tail.Next;
-            rightHulf.Length = Length - Length / 2;
-            Length /= 2;
-            _tail.Next = null;
-            return rightHulf;
-        }
 
         public void AscendingSort()
         {
@@ -520,6 +512,14 @@ namespace Lists
             {
                 return true;
             }
+            if (this._tail.Value != list._tail.Value)
+            {
+                return false;
+            }
+            if (!(this._tail.Next is null) || !(list._tail.Next is null))
+            {
+                return false;
+            }
             Node currentThis = this._root;
             Node currentList = list._root;
 
@@ -538,6 +538,17 @@ namespace Lists
             }
 
             return true;
+        }
+        private LinkedList CutRightHulf()
+        {
+            LinkedList rightHulf = new LinkedList();
+            rightHulf._tail = _tail;
+            _tail = GetNodeByIndex(Length / 2 - 1);
+            rightHulf._root = _tail.Next;
+            rightHulf.Length = Length - Length / 2;
+            Length /= 2;
+            _tail.Next = null;
+            return rightHulf;
         }
 
         private void RemoveCurrentNode(Node currentNode, int index, Node previousNode)
