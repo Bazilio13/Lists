@@ -250,7 +250,6 @@ namespace Lists
                     right.MergeSort();
                 }
 
-                LinkedList mergedList = new LinkedList();
                 left._tail = left._root;
                 Node currentLeft = left._root;
                 Node currentRight = right._root;
