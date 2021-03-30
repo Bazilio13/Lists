@@ -1,4 +1,5 @@
 ﻿using System;
+using Lists;
 
 namespace ListsNew
 {
@@ -6,7 +7,7 @@ namespace ListsNew
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            DoubleLinkedList list = new DoubleLinkedList(2);
         }
     }
 }

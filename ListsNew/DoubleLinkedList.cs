@@ -4,78 +4,31 @@ using System.Text;
 
 namespace Lists
 {
-    public class LinkedList
+    public class DoubleLinkedList
     {
-        private Node _root;
-        private Node _tail;
+        private DoubleLinkedListNode _root;
+        private DoubleLinkedListNode _tail;
 
         public int Length { get; private set; }
 
-        public int this[int index]
+        public DoubleLinkedList()
         {
-            get
-            {
-                return GetNodeByIndex(index).Value;
-            }
-            set
-            {
-                GetNodeByIndex(index).Value = value;
-            }
-        }
-
-        public LinkedList()
-        {
-            Length = 0;
             _root = null;
             _tail = null;
+            Length = 0;
         }
 
-        public LinkedList(int value)
+        public DoubleLinkedList(int value)
         {
-            Length = 1;
-            _root = new Node(value);
-            _tail = _root;
+            Add(value);
         }
 
-        public LinkedList(int[] values)
+        public DoubleLinkedList(int[] values)
         {
-            if (values.Length != 0)
+            for (int i = 0; i < values.Length; i++)
             {
-                for (int i = 0; i < values.Length; i++)
-                {
-                    Add(values[i]);
-                }
+                Add(values[i]);
             }
-
-
-        }
-
-        public void Add(int value)
-        {
-            if (Length == 0)
-            {
-                _root = new Node(value);
-                _tail = _root;
-            }
-            else
-            {
-                _tail.Next = new Node(value);
-                _tail = _tail.Next;
-            }
-
-            Length++;
-        }
-
-        public void AddToTheBeginning(int value)
-        {
-            Node tmpNode = _root;
-            _root = new Node(value);
-            _root.Next = tmpNode;
-            if (Length == 0)
-            {
-                _tail = _root;
-            }
-            Length++;
         }
 
         public void AddByIndex(int value, int index)
@@ -90,12 +43,46 @@ namespace Lists
                 Add(value);
                 return;
             }
-            Node previousNode = GetNodeByIndex(index - 1);
-            Node addedNode = new Node(value);
-            addedNode.Next = previousNode.Next;
-            previousNode.Next = addedNode;
+            DoubleLinkedListNode currentNode = GetNodeByIndex(index);
+            DoubleLinkedListNode addedNode = new DoubleLinkedListNode(value);
+            addedNode.Next = currentNode;
+            addedNode.Previous = currentNode.Previous;
+            currentNode.Previous = addedNode;
+            addedNode.Previous.Next = addedNode;
             Length++;
 
+        }
+
+        public void Add(int value)
+        {
+            if (Length == 0)
+            {
+                _root = new DoubleLinkedListNode(value);
+                _tail = _root;
+            }
+            else
+            {
+                _tail.Next = new DoubleLinkedListNode(value);
+                _tail.Next.Previous = _tail;
+                _tail = _tail.Next;
+            }
+
+            Length++;
+        }
+
+        public void AddToTheBeginning(int value)
+        {
+            if (Length == 0)
+            {
+                Add(value);
+            }
+            else
+            {
+                _root.Previous = new DoubleLinkedListNode(value);
+                _root.Previous.Next = _root;
+                _root = _root.Previous;
+                Length++;
+            }
         }
 
         public void RemoveFromTheEnd(int number = 1)
@@ -142,11 +129,39 @@ namespace Lists
             else
             {
                 _root = GetNodeByIndex(number);
+                _root.Previous = null;
                 Length -= number;
             }
         }
 
-        public void RemoveByIndex(int index, int number = 1)
+        public void RemoveByIndex(int index)
+        {
+            if (index < 0 || index >= Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            if (index == 0)
+            {
+                RemoveFromTheBeginning();
+            }
+            else
+            {
+                if (index == Length - 1)
+                {
+                    RemoveFromTheEnd();
+                }
+                else
+                {
+                    DoubleLinkedListNode removingNode = GetNodeByIndex(index);
+                    removingNode.Previous.Next = removingNode.Next;
+                    removingNode.Next.Previous = removingNode.Previous;
+                    Length--;
+                }
+            }
+
+        }
+
+        public void RemoveByIndex(int index, int number)
         {
             if (index < 0 || index >= Length)
             {
@@ -156,35 +171,34 @@ namespace Lists
             {
                 throw new ArgumentException();
             }
+            if (number == 0) return;
             if (index == 0)
             {
                 RemoveFromTheBeginning(number);
             }
             else
             {
-                Node previousNode = GetNodeByIndex(index - 1);
                 if (Length - index <= number)
                 {
+                    DoubleLinkedListNode previousNode = GetNodeByIndex(index - 1);
                     _tail = previousNode;
                     _tail.Next = null;
                     Length = index;
                 }
                 else
                 {
-                    for (int i = 0; i < number; i++)
-                    {
-                        previousNode.Next = previousNode.Next.Next;
-                    }
+                    DoubleLinkedList segment = GetSegmentOfList(index, index + number - 1);
+                    segment._root.Previous.Next = segment._tail.Next;
+                    segment._tail.Next.Previous = segment._root.Previous;
                     Length -= number;
                 }
             }
-
         }
 
         public int GetIndexByValue(int value)
         {
             int index = -1;
-            Node currant = _root;
+            DoubleLinkedListNode currant = _root;
             for (int i = 0; i < Length; i++)
             {
                 if (value == currant.Value)
@@ -195,22 +209,22 @@ namespace Lists
             }
             return index;
         }
-
         public void ReversList()
         {
             if (Length > 1)
             {
-                _tail = _root;
-                Node previous = null;
-                Node next = _root.Next;
-                while (!(_root.Next is null))
+                DoubleLinkedListNode current = _root;
+                DoubleLinkedListNode tmp;
+                while (!(current is null))
                 {
-                    _root.Next = previous;
-                    previous = _root;
-                    _root = next;
-                    next = next.Next;
+                    tmp = current.Next;
+                    current.Next = current.Previous;
+                    current.Previous = tmp;
+                    current = tmp;
                 }
-                _root.Next = previous;
+                tmp = _root;
+                _root = _tail;
+                _tail = tmp;
             }
         }
 
@@ -233,155 +247,78 @@ namespace Lists
             return GetMinElementWithIndex()._tail.Value;
         }
 
-        public void MergeSort()
+        public void AscendingSort()
         {
             if (Length > 1)
             {
-                LinkedList right = this.CutRightHulf();
+                DoubleLinkedList right = this.CutRightHulf();
                 if (Length > 1)
                 {
-                    MergeSort();
+                    AscendingSort();
                 }
                 if (right.Length > 1)
                 {
-                    right.MergeSort();
+                    right.AscendingSort();
                 }
-                Node currentLeft = _root;
-                Node currentRight = right._root;
-                _tail = null;
-                if (right._root.Value < _root.Value)
-                {
-                    _root = right._root;
-                    _tail = right._root;
-                    currentRight = currentRight.Next;
-                }
-                else
-                {
-                    _tail = _root;
-                    currentLeft = currentLeft.Next;
-                }
-                while (!(currentLeft is null))
-                {
-                    if (currentRight is null || currentLeft.Value <= currentRight.Value)
-                    {
-                        HookNode(currentLeft);
-                        currentLeft = currentLeft.Next;
-                    }
-                    else
-                    {
-                        while (!(currentRight is null))
-                        {
-                            if (currentRight.Value <= currentLeft.Value)
-                            {
-                                HookNode(currentRight);
-                                currentRight = currentRight.Next;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-                while (!(currentRight is null))
-                {
-                    HookNode(currentRight);
-                    currentRight = currentRight.Next;
-                }
-                _tail.Next = null;
-                Length += right.Length;
+                Merge(right, true);
             }
         }
 
-
-        public void AscendingSort()
-        {
-            Node iNode = _root;
-            int tmp;
-            for (int i = 0; i < Length; i++)
-            {
-                Node jNode = iNode.Next;
-                for (int j = i + 1; j < Length; j++)
-                {
-                    if (iNode.Value > jNode.Value)
-                    {
-                        tmp = iNode.Value;
-                        iNode.Value = jNode.Value;
-                        jNode.Value = tmp;
-                    }
-                    jNode = jNode.Next;
-                }
-                iNode = iNode.Next;
-            }
-        }
         public void DescendingSort()
         {
-            Node iNode = _root;
-            int tmp;
-            for (int i = 0; i < Length; i++)
+            if (Length > 1)
             {
-                Node jNode = iNode.Next;
-                for (int j = i + 1; j < Length; j++)
+                DoubleLinkedList right = this.CutRightHulf();
+                if (Length > 1)
                 {
-                    if (iNode.Value < jNode.Value)
-                    {
-                        tmp = iNode.Value;
-                        iNode.Value = jNode.Value;
-                        jNode.Value = tmp;
-                    }
-                    jNode = jNode.Next;
+                    DescendingSort();
                 }
-                iNode = iNode.Next;
+                if (right.Length > 1)
+                {
+                    right.DescendingSort();
+                }
+                Merge(right, false);
             }
         }
 
         public int RemoveFirstByValue(int value)
         {
-            Node current = _root;
-            Node previous = null;
+            DoubleLinkedListNode current = _root;
             for (int i = 0; i < Length; i++)
             {
                 if (current.Value == value)
                 {
-                    RemoveCurrentNode(current, i, previous);
-
+                    RemoveCurrentNode(current, i);
                     return i;
                 }
-                previous = current;
                 current = current.Next;
             }
-
             return -1;
         }
 
         public int RemoveAllByValue(int value)
         {
-            Node current = _root;
-            Node previous = null;
             int countOfRemoved = 0;
+            DoubleLinkedListNode current = _root;
             for (int i = 0; i < Length; i++)
             {
                 if (current.Value == value)
                 {
-                    RemoveCurrentNode(current, i, previous);
+                    RemoveCurrentNode(current, i);
                     countOfRemoved++;
-                    current = current.Next;
                     i--;
-                    continue;
-
                 }
-                previous = current;
                 current = current.Next;
             }
 
             return countOfRemoved;
         }
 
-        public void AddListToTheEnd(LinkedList list)
+        public void AddListToTheEnd(DoubleLinkedList list)
         {
             if (list.Length != 0)
             {
-                LinkedList copy = Copy(list);
+                DoubleLinkedList copy = Copy(list);
                 if (Length == 0)
                 {
                     _root = copy._root;
@@ -391,6 +328,7 @@ namespace Lists
                 else
                 {
                     _tail.Next = copy._root;
+                    copy._root.Previous = _tail;
                     _tail = copy._tail;
                     Length += copy.Length;
                 }
@@ -398,11 +336,11 @@ namespace Lists
             }
         }
 
-        public void AddListToTheBeggining(LinkedList list)
+        public void AddListToTheBeggining(DoubleLinkedList list)
         {
             if (list.Length != 0)
             {
-                LinkedList copy = Copy(list);
+                DoubleLinkedList copy = Copy(list);
                 if (Length == 0)
                 {
                     _root = copy._root;
@@ -412,6 +350,7 @@ namespace Lists
                 else
                 {
                     copy._tail.Next = _root;
+                    _root.Previous = copy._tail;
                     _root = copy._root;
                     Length += copy.Length;
                 }
@@ -419,7 +358,7 @@ namespace Lists
             }
         }
 
-        public void AddListByIndex(LinkedList list, int index)
+        public void AddListByIndex(DoubleLinkedList list, int index)
         {
             if (index < 0 || index > Length)
             {
@@ -438,33 +377,25 @@ namespace Lists
                 }
                 else
                 {
-                    LinkedList copy = Copy(list);
-                    if (Length == 0)
-                    {
-                        _root = copy._root;
-                        _tail = copy._tail;
-                        Length = copy.Length;
-                    }
-                    else
-                    {
-                        Node tmp;
-                        tmp = GetNodeByIndex(index - 1);
-                        copy._tail.Next = tmp.Next;
-                        tmp.Next = copy._root;
-                        Length += copy.Length;
-                    }
+                    DoubleLinkedList copy = Copy(list);
+                    DoubleLinkedListNode tmp;
+                    tmp = GetNodeByIndex(index);
+                    copy._tail.Next = tmp;
+                    copy._root.Previous = tmp.Previous;
+                    tmp.Previous.Next = copy._root;
+                    tmp.Previous = copy._tail;
+                    Length += copy.Length;
                 }
             }
         }
 
-        public LinkedList Copy(LinkedList list)
+        public DoubleLinkedList Copy(DoubleLinkedList list)
         {
-            LinkedList newList = new LinkedList();
+            DoubleLinkedList newList = new DoubleLinkedList();
             if (list.Length != 0)
             {
-                Node current;
-                current = list._root;
-                for (int i = 0; i < list.Length; i++)
+                DoubleLinkedListNode current = list._root;
+                while (!(current is null))
                 {
                     newList.Add(current.Value);
                     current = current.Next;
@@ -473,12 +404,13 @@ namespace Lists
             return newList;
         }
 
+
         public override string ToString()
         {
             string s = string.Empty;
             if (Length != 0)
             {
-                Node current = _root;
+                DoubleLinkedListNode current = _root;
                 while (!(current.Next is null))
                 {
                     s += current.Value + " ";
@@ -492,7 +424,7 @@ namespace Lists
 
         public override bool Equals(object obj)
         {
-            LinkedList list = (LinkedList)obj;
+            DoubleLinkedList list = (DoubleLinkedList)obj;
             if (this.Length != list.Length)
             {
                 return false;
@@ -509,8 +441,8 @@ namespace Lists
             {
                 return false;
             }
-            Node currentThis = this._root;
-            Node currentList = list._root;
+            DoubleLinkedListNode currentThis = this._root;
+            DoubleLinkedListNode currentList = list._root;
 
             while (!(currentThis.Next is null))
             {
@@ -529,42 +461,93 @@ namespace Lists
             return true;
         }
 
-        private LinkedList CutRightHulf()
+        public void RemoveCurrentNode(DoubleLinkedListNode current, int index)
         {
-            LinkedList rightHulf = new LinkedList();
+            if (index == 0)
+            {
+                RemoveFromTheBeginning();
+            }
+            else if (index == Length - 1)
+            {
+                RemoveFromTheEnd();
+            }
+            else
+            {
+                current.Next.Previous = current.Previous;
+                current.Previous.Next = current.Next;
+                Length--;
+            }
+
+        }
+
+        private void Merge(DoubleLinkedList rightList, bool isAscending)
+        {
+            DoubleLinkedListNode currentLeft = _root;
+            DoubleLinkedListNode currentRight = rightList._root;
+            if (rightList._root.Value >= _root.Value ^ isAscending)
+            {
+                _root = rightList._root;
+                _tail = rightList._root;
+                currentRight = currentRight.Next;
+            }
+            else
+            {
+                _tail = _root;
+                currentLeft = currentLeft.Next;
+            }
+            while (!(currentLeft is null))
+            {
+                if (currentRight is null || (currentLeft.Value >= currentRight.Value ^ isAscending))
+                {
+                    HookNode(currentLeft);
+                    currentLeft = currentLeft.Next;
+                }
+                else
+                {
+                    while (!(currentRight is null))
+                    {
+                        if (currentRight.Value >= currentLeft.Value ^ isAscending)
+                        {
+                            HookNode(currentRight);
+                            currentRight = currentRight.Next;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            while (!(currentRight is null))
+            {
+                HookNode(currentRight);
+                currentRight = currentRight.Next;
+            }
+            _tail.Next = null;
+            Length += rightList.Length;
+        }
+
+        private DoubleLinkedList CutRightHulf()
+        {
+            DoubleLinkedList rightHulf = new DoubleLinkedList();
             rightHulf._tail = _tail;
             _tail = GetNodeByIndex(Length / 2 - 1);
             rightHulf._root = _tail.Next;
+            rightHulf._root.Previous = null;
             rightHulf.Length = Length - Length / 2;
             Length /= 2;
             _tail.Next = null;
             return rightHulf;
         }
 
-        private void HookNode(Node hookedNode)
+        private void HookNode(DoubleLinkedListNode hookedNode)
         {
             _tail.Next = hookedNode;
+            hookedNode.Previous = _tail;
             _tail = hookedNode;
         }
-        private void RemoveCurrentNode(Node currentNode, int index, Node previousNode)
-        {
-            if (index == 0)
-            {
-                _root = GetNewNextAndRemoveNode(currentNode);
-            }
-            else if (index == Length - 1)
-            {
-                _tail = previousNode;
-                _tail.Next = null;
-                Length--;
-            }
-            else
-            {
-                previousNode.Next = GetNewNextAndRemoveNode(currentNode);
-            }
-        }
 
-        private LinkedList GetMaxElementWithIndex()
+        private DoubleLinkedList GetMaxElementWithIndex()
         {
             if (Length == 0)
             {
@@ -572,7 +555,7 @@ namespace Lists
             }
             int maxElement;
             maxElement = _root.Value;
-            Node current = _root;
+            DoubleLinkedListNode current = _root;
             int indexOfMaxElement = 0;
             for (int i = 1; i < Length; i++)
             {
@@ -583,10 +566,10 @@ namespace Lists
                     indexOfMaxElement = i;
                 }
             }
-            LinkedList maxElementWithIndex = new LinkedList(new int[] { maxElement, indexOfMaxElement });
+            DoubleLinkedList maxElementWithIndex = new DoubleLinkedList(new int[] { maxElement, indexOfMaxElement });
             return maxElementWithIndex;
         }
-        private LinkedList GetMinElementWithIndex()
+        private DoubleLinkedList GetMinElementWithIndex()
         {
             if (Length == 0)
             {
@@ -594,7 +577,7 @@ namespace Lists
             }
             int minElement;
             minElement = _root.Value;
-            Node current = _root;
+            DoubleLinkedListNode current = _root;
             int indexOfMinElement = 0;
             for (int i = 1; i < Length; i++)
             {
@@ -605,42 +588,68 @@ namespace Lists
                     indexOfMinElement = i;
                 }
             }
-            LinkedList maxElementWithIndex = new LinkedList(new int[] { minElement, indexOfMinElement });
+            DoubleLinkedList maxElementWithIndex = new DoubleLinkedList(new int[] { minElement, indexOfMinElement });
             return maxElementWithIndex;
         }
 
-        private Node GetNewNextAndRemoveNode(Node node)
-        {
-            Length--;
-            if (!(node.Next is null))
-            {
-                return node.Next;
-            }
-            return null;
-        }
-        private Node GetNodeByIndex(int index)
+        private DoubleLinkedListNode GetNodeByIndex(int index)
         {
             if (index < 0 || index >= Length)
             {
                 throw new IndexOutOfRangeException();
             }
-
-            Node current;
-            if (index == Length - 1)
+            DoubleLinkedListNode current;
+            if (index > Length / 2)
             {
                 current = _tail;
+                current = StepLeft(current, Length - 1 - index);
             }
             else
             {
                 current = _root;
-
-
-                for (int i = 1; i <= index; i++)
-                {
-                    current = current.Next;
-                }
+                current = StepRight(current, index);
             }
             return current;
         }
+
+        private DoubleLinkedList GetSegmentOfList(int indexLeft, int indexRight)
+        {
+            DoubleLinkedList segment = new DoubleLinkedList();
+            if (indexLeft <= Length - 1 - indexRight)
+            {
+                segment._root = GetNodeByIndex(indexLeft);
+                segment._tail = _tail;
+                segment.Length = Length - indexLeft;
+                segment._tail = segment.GetNodeByIndex(indexRight - indexLeft);
+            }
+            else
+            {
+                segment._root = _root;
+                segment._tail = GetNodeByIndex(indexRight);
+                segment.Length = indexRight + 1;
+                segment._root = segment.GetNodeByIndex(indexLeft);
+            }
+            return segment;
+        }
+
+        private DoubleLinkedListNode StepLeft(DoubleLinkedListNode current, int steps)
+        {
+            for (int i = 0; i < steps; i++)
+            {
+                current = current.Previous;
+            }
+            return current;
+        }
+
+        private DoubleLinkedListNode StepRight(DoubleLinkedListNode current, int steps)
+        {
+            for (int i = 0; i < steps; i++)
+            {
+                current = current.Next;
+            }
+            return current;
+        }
+
+
     }
 }

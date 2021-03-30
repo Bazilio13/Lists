@@ -6,9 +6,9 @@ namespace Lists
 {
     public class ArrayList
     {
-        public int Length { get; private set; }
-
         private int[] _array;
+        
+        public int Length { get; private set; }
 
         public ArrayList()
         {
@@ -364,14 +364,6 @@ namespace Lists
 
             ShiftRight(index, list.Length);
             InsertList(list, index);
-
-            //int j = 0;
-
-            //for (int i = index; i < index + list.Length; i++)
-            //{
-            //    _array[i] = list[j];
-            //    j++;
-            //}
         }
 
         public override bool Equals(object obj)
