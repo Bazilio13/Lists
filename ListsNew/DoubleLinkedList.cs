@@ -251,16 +251,7 @@ namespace Lists
         {
             if (Length > 1)
             {
-                DoubleLinkedList right = this.CutRightHulf();
-                if (Length > 1)
-                {
-                    AscendingSort();
-                }
-                if (right.Length > 1)
-                {
-                    right.AscendingSort();
-                }
-                Merge(right, true);
+                Merge(true);
             }
         }
 
@@ -268,16 +259,7 @@ namespace Lists
         {
             if (Length > 1)
             {
-                DoubleLinkedList right = this.CutRightHulf();
-                if (Length > 1)
-                {
-                    DescendingSort();
-                }
-                if (right.Length > 1)
-                {
-                    right.DescendingSort();
-                }
-                Merge(right, false);
+                Merge(false);
             }
         }
 
@@ -480,8 +462,17 @@ namespace Lists
 
         }
 
-        private void Merge(DoubleLinkedList rightList, bool isAscending)
+        private void Merge(bool isAscending)
         {
+            DoubleLinkedList rightList = this.CutRightHulf();
+            if (Length > 1)
+            {
+                Merge(isAscending);
+            }
+            if (rightList.Length > 1)
+            {
+                rightList.Merge(isAscending);
+            }
             DoubleLinkedListNode currentLeft = _root;
             DoubleLinkedListNode currentRight = rightList._root;
             if (rightList._root.Value >= _root.Value ^ isAscending)
